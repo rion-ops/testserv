@@ -198,7 +198,7 @@
             font-size: 0.9em;
         }
         
-        .usd1-status {
+        .usdt-status {
             background: #e7f3ff;
             border: 1px solid #b3d9ff;
             color: #0066cc;
@@ -223,7 +223,7 @@
     <div class="container">
         <div class="header">
             <h1>🪙 TEST402</h1>
-            <p class="subtitle">Token Sale Platform - USD1</p>
+            <p class="subtitle">Token Sale Platform</p>
         </div>
         
         <div class="token-info">
@@ -234,20 +234,16 @@
             </div>
             <div class="info-item">
                 <span class="info-label">Price:</span>
-                <span class="info-value">100 TEST402 = 0.01 USD1</span>
+                <span class="info-value">100 TEST402 = 0.01 USDT</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Network:</span>
                 <span class="info-value">BSC Mainnet</span>
             </div>
-            <div class="info-item">
-                <span class="info-label">Token Address:</span>
-                <span class="info-value">0xE6710ffE33CeaAE0812ebF7080eDEb2Dc936B6fB</span>
-            </div>
         </div>
         
         <div class="warning">
-            ⚠️ <strong>Important:</strong> Make sure you are on BSC Mainnet and have USD1 balance.
+            ⚠️ <strong>Important:</strong> Make sure you are on BSC Mainnet and have USDT balance.
         </div>
 
         <!-- Wallet Connection Section -->
@@ -268,19 +264,19 @@
             </div>
         </div>
 
-        <!-- USD1 Approval Section -->
+        <!-- USDT Approval Section -->
         <div class="section">
-            <h3>🔐 2. Approve USD1</h3>
-            <button id="approveUSD1Btn" disabled>Approve USD1 for B402</button>
-            <button id="checkUSD1Btn" disabled>Check USD1 Status</button>
-            <div id="usd1Status" class="usd1-status hidden">
+            <h3>🔐 2. Approve USDT</h3>
+            <button id="approveUSDTBtn" disabled>Approve USDT for B402</button>
+            <button id="checkUSDTBtn" disabled>Check USDT Status</button>
+            <div id="usdtStatus" class="usdt-status hidden">
                 <div class="info-item">
-                    <span class="info-label">USD1 Balance:</span>
-                    <span id="usd1Balance" class="info-value">-</span>
+                    <span class="info-label">USDT Balance:</span>
+                    <span id="usdtBalance" class="info-value">-</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">B402 Allowance:</span>
-                    <span id="usd1Allowance" class="info-value">-</span>
+                    <span id="usdtAllowance" class="info-value">-</span>
                 </div>
             </div>
         </div>
@@ -289,8 +285,8 @@
         <div class="section">
             <h3>💳 3. Buy TEST402 Tokens</h3>
             <div class="input-group">
-                <label for="usd1Amount">USD1 Amount to Pay:</label>
-                <input type="number" id="usd1Amount" value="0.01" min="0.01" max="10" step="0.01" placeholder="0.01">
+                <label for="usdtAmount">USDT Amount to Pay:</label>
+                <input type="number" id="usdtAmount" value="0.01" min="0.01" max="10" step="0.01" placeholder="0.01">
             </div>
             <button id="buyTokens" disabled>Buy TEST402 Tokens</button>
             <div class="info-item">
@@ -312,12 +308,12 @@
     </div>
 
     <script>
-        // Configuration - USD1
+        // Configuration - USDT
         const CONFIG = {
             BACKEND_URL: 'https://b420-test.onrender.com',
-            TOKEN_PRICE: 100, // 100 TEST402 per 0.01 USD1
-            USD1_ADDRESS: '0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d',
-            RELAYER_CONTRACT: '0xE1C2830d5DDd6B49E9c46EbE03a98Cb44CD8eA5a',
+            TOKEN_PRICE: 100, // 100 TEST402 per 0.01 USDT
+            USDT_ADDRESS: '0x55d398326f99059fF775485246999027B3197955',
+            RELAYER_CONTRACT: '0x50c1ac0BF26E55CB6064820eb4B99B086A6bDFeb',
             SELLER_ADDRESS: '0x50c1ac0BF26E55CB6064820eb4B99B086A6bDFeb'
         };
 
@@ -326,12 +322,12 @@
         const walletInfo = document.getElementById('walletInfo');
         const walletAddress = document.getElementById('walletAddress');
         const bnbBalance = document.getElementById('bnbBalance');
-        const approveUSD1Btn = document.getElementById('approveUSD1Btn');
-        const checkUSD1Btn = document.getElementById('checkUSD1Btn');
-        const usd1Status = document.getElementById('usd1Status');
-        const usd1Balance = document.getElementById('usd1Balance');
-        const usd1Allowance = document.getElementById('usd1Allowance');
-        const usd1AmountInput = document.getElementById('usd1Amount');
+        const approveUSDTBtn = document.getElementById('approveUSDTBtn');
+        const checkUSDTBtn = document.getElementById('checkUSDTBtn');
+        const usdtStatus = document.getElementById('usdtStatus');
+        const usdtBalance = document.getElementById('usdtBalance');
+        const usdtAllowance = document.getElementById('usdtAllowance');
+        const usdtAmountInput = document.getElementById('usdtAmount');
         const buyTokensBtn = document.getElementById('buyTokens');
         const tokensToReceive = document.getElementById('tokensToReceive');
         const statusMessage = document.getElementById('statusMessage');
@@ -342,15 +338,15 @@
 
         // Event Listeners
         connectWalletBtn.addEventListener('click', connectWallet);
-        approveUSD1Btn.addEventListener('click', approveUSD1);
-        checkUSD1Btn.addEventListener('click', checkUSD1Status);
+        approveUSDTBtn.addEventListener('click', approveUSDT);
+        checkUSDTBtn.addEventListener('click', checkUSDTStatus);
         buyTokensBtn.addEventListener('click', buyTokens);
-        usd1AmountInput.addEventListener('input', updateTokensCalculation);
+        usdtAmountInput.addEventListener('input', updateTokensCalculation);
 
         // Update tokens calculation
         function updateTokensCalculation() {
-            const usd1Amount = parseFloat(usd1AmountInput.value) || 0;
-            const tokens = Math.floor((usd1Amount / 0.01) * CONFIG.TOKEN_PRICE);
+            const usdtAmount = parseFloat(usdtAmountInput.value) || 0;
+            const tokens = Math.floor((usdtAmount / 0.01) * CONFIG.TOKEN_PRICE);
             tokensToReceive.textContent = tokens.toLocaleString() + ' TEST402';
         }
 
@@ -374,14 +370,14 @@
                 walletInfo.classList.remove('hidden');
                 connectWalletBtn.textContent = '✅ Connected';
                 connectWalletBtn.disabled = true;
-                approveUSD1Btn.disabled = false;
-                checkUSD1Btn.disabled = false;
+                approveUSDTBtn.disabled = false;
+                checkUSDTBtn.disabled = false;
                 buyTokensBtn.disabled = false;
 
                 // Get balances
                 await getBNBBalance();
                 await checkNetwork();
-                await checkUSD1Status();
+                await checkUSDTStatus();
 
                 updateStatus('Wallet connected successfully!', 'success');
 
@@ -418,61 +414,61 @@
             }
         }
 
-        // Check USD1 Status
-        async function checkUSD1Status() {
+        // Check USDT Status
+        async function checkUSDTStatus() {
             try {
-                const usd1Contract = new ethers.Contract(CONFIG.USD1_ADDRESS, [
+                const usdtContract = new ethers.Contract(CONFIG.USDT_ADDRESS, [
                     'function balanceOf(address) view returns (uint256)',
                     'function allowance(address, address) view returns (uint256)'
                 ], signer);
 
-                const balance = await usd1Contract.balanceOf(userAddress);
-                const allowance = await usd1Contract.allowance(userAddress, CONFIG.RELAYER_CONTRACT);
+                const balance = await usdtContract.balanceOf(userAddress);
+                const allowance = await usdtContract.allowance(userAddress, CONFIG.RELAYER_CONTRACT);
                 
                 const balanceFormatted = parseFloat(ethers.utils.formatUnits(balance, 18)).toFixed(4);
                 const allowanceFormatted = parseFloat(ethers.utils.formatUnits(allowance, 18)).toFixed(4);
                 
-                usd1Balance.textContent = balanceFormatted + ' USD1';
-                usd1Allowance.textContent = allowanceFormatted + ' USD1';
-                usd1Status.classList.remove('hidden');
+                usdtBalance.textContent = balanceFormatted + ' USDT';
+                usdtAllowance.textContent = allowanceFormatted + ' USDT';
+                usdtStatus.classList.remove('hidden');
                 
-                console.log('💰 USD1 Balance:', balanceFormatted);
-                console.log('🔐 USD1 Allowance:', allowanceFormatted);
+                console.log('💰 USDT Balance:', balanceFormatted);
+                console.log('🔐 USDT Allowance:', allowanceFormatted);
                 
                 return { balance, allowance, balanceFormatted, allowanceFormatted };
             } catch (error) {
-                console.error('USD1 check error:', error);
-                usd1Balance.textContent = 'Error';
-                usd1Allowance.textContent = 'Error';
+                console.error('USDT check error:', error);
+                usdtBalance.textContent = 'Error';
+                usdtAllowance.textContent = 'Error';
                 return null;
             }
         }
 
-        // Approve USD1
-        async function approveUSD1() {
+        // Approve USDT
+        async function approveUSDT() {
             try {
-                updateStatus('Approving USD1 for B402...', 'loading');
-                approveUSD1Btn.disabled = true;
+                updateStatus('Approving USDT for B402...', 'loading');
+                approveUSDTBtn.disabled = true;
                 
-                const usd1Contract = new ethers.Contract(CONFIG.USD1_ADDRESS, [
+                const usdtContract = new ethers.Contract(CONFIG.USDT_ADDRESS, [
                     'function approve(address, uint256) returns (bool)'
                 ], signer);
 
                 // Unlimited approval
                 const approveAmount = ethers.constants.MaxUint256;
                 
-                console.log('🔐 Approving USD1 to:', CONFIG.RELAYER_CONTRACT);
+                console.log('🔐 Approving USDT to:', CONFIG.RELAYER_CONTRACT);
                 
-                const tx = await usd1Contract.approve(CONFIG.RELAYER_CONTRACT, approveAmount);
+                const tx = await usdtContract.approve(CONFIG.RELAYER_CONTRACT, approveAmount);
                 
                 updateStatus('Waiting for approval confirmation...', 'loading');
                 await tx.wait();
                 
-                console.log('✅ USD1 approved successfully!');
-                updateStatus('USD1 approved! You can now make payments.', 'success');
+                console.log('✅ USDT approved successfully!');
+                updateStatus('USDT approved! You can now make payments.', 'success');
                 
-                // Refresh USD1 status
-                await checkUSD1Status();
+                // Refresh USDT status
+                await checkUSDTStatus();
                 
                 return true;
             } catch (error) {
@@ -480,16 +476,16 @@
                 updateStatus('Approval failed: ' + error.message, 'error');
                 return false;
             } finally {
-                approveUSD1Btn.disabled = false;
+                approveUSDTBtn.disabled = false;
             }
         }
 
         // Buy Tokens
         async function buyTokens() {
-            const usd1Amount = usd1AmountInput.value;
+            const usdtAmount = usdtAmountInput.value;
             
-            if (!usd1Amount || usd1Amount <= 0) {
-                updateStatus('Please enter a valid USD1 amount', 'error');
+            if (!usdtAmount || usdtAmount <= 0) {
+                updateStatus('Please enter a valid USDT amount', 'error');
                 return;
             }
 
@@ -497,24 +493,24 @@
 
             try {
                 buyTokensBtn.disabled = true;
-                updateStatus('Checking USD1 status...', 'loading');
+                updateStatus('Checking USDT status...', 'loading');
 
-                // Check USD1 balance and allowance
-                const usd1Status = await checkUSD1Status();
-                if (!usd1Status) {
-                    throw new Error('Failed to check USD1 status');
+                // Check USDT balance and allowance
+                const usdtStatus = await checkUSDTStatus();
+                if (!usdtStatus) {
+                    throw new Error('Failed to check USDT status');
                 }
 
-                const amountInWei = ethers.utils.parseUnits(usd1Amount, 18);
+                const amountInWei = ethers.utils.parseUnits(usdtAmount, 18);
                 
                 // Check balance
-                if (usd1Status.balance.lt(amountInWei)) {
-                    throw new Error(`Insufficient USD1 balance. You have ${usd1Status.balanceFormatted} USD1, need ${usd1Amount} USD1`);
+                if (usdtStatus.balance.lt(amountInWei)) {
+                    throw new Error(`Insufficient USDT balance. You have ${usdtStatus.balanceFormatted} USDT, need ${usdtAmount} USDT`);
                 }
 
                 // Check allowance
-                if (usd1Status.allowance.lt(amountInWei)) {
-                    updateStatus('Insufficient allowance. Please approve USD1 first.', 'error');
+                if (usdtStatus.allowance.lt(amountInWei)) {
+                    updateStatus('Insufficient allowance. Please approve USDT first.', 'error');
                     return;
                 }
 
@@ -540,7 +536,7 @@
                 if (result.success) {
                     displaySuccess(result);
                     await getBNBBalance();
-                    await checkUSD1Status();
+                    await checkUSDTStatus();
                 } else {
                     throw new Error(result.error || 'Payment failed');
                 }
@@ -552,7 +548,7 @@
                 if (error.message.includes('user rejected')) {
                     updateStatus('❌ Transaction cancelled by user', 'error');
                 } else if (error.message.includes('insufficient funds')) {
-                    updateStatus('💸 Insufficient USD1 balance', 'error');
+                    updateStatus('💸 Insufficient USDT balance', 'error');
                 } else if (error.message.includes('network')) {
                     updateStatus('🌐 Wrong network. Please switch to BSC Mainnet', 'error');
                 } else {
@@ -588,26 +584,28 @@
                 from: userAddress,
                 to: CONFIG.RELAYER_CONTRACT, // ✅ B402 Relayer
                 value: amountInWei,
-                token: CONFIG.USD1_ADDRESS,  // ✅ USD1 Token
+                token: CONFIG.USDT_ADDRESS,  // ✅ USDT Token
                 validAfter: validAfter,
                 validBefore: validBefore,
                 nonce: nonce
             };
         }
 
-        // Create Signature
+        // Create Signature - B402 STANDARD (ORIGINAL)
         async function createSignature(authorization) {
             const network = await provider.getNetwork();
             
+            // ✅ B402 STANDARD DOMAIN (ORIGINAL)
             const domain = {
-                name: 'B402',
+                name: 'B402',                    // ✅ 'B402'
                 version: '1',
                 chainId: network.chainId,
                 verifyingContract: CONFIG.RELAYER_CONTRACT
             };
 
+            // ✅ B402 STANDARD TYPES (ORIGINAL)
             const types = {
-                TransferWithAuthorization: [
+                TransferWithAuthorization: [     // ✅ 'TransferWithAuthorization'
                     { name: 'from', type: 'address' },
                     { name: 'to', type: 'address' },
                     { name: 'value', type: 'uint256' },
@@ -626,17 +624,19 @@
                 nonce: authorization.nonce
             };
 
-            console.log('🔍 EIP-712 Signing Details:');
+            console.log('🔍 B402 EIP-712 Signing Details:');
             console.log('Domain:', domain);
+            console.log('Types:', types);
             console.log('Message:', message);
 
             try {
                 const signature = await signer._signTypedData(domain, types, message);
-                console.log('✅ EIP-712 Signature generated');
+                console.log('✅ B402 EIP-712 Signature generated');
+                console.log('📝 Signature:', signature);
                 return signature;
             } catch (error) {
-                console.error('❌ EIP-712 Signing error:', error);
-                throw new Error('Failed to sign EIP-712: ' + error.message);
+                console.error('❌ B402 EIP-712 Signing error:', error);
+                throw new Error('Failed to sign B402 EIP-712: ' + error.message);
             }
         }
 
@@ -710,7 +710,7 @@
         }
 
         // Initialize
-        console.log('🚀 TEST402 Token Sale Frontend Loaded - USD1 Version');
+        console.log('🚀 TEST402 Token Sale Frontend Loaded - USDT Version');
         console.log('🔧 Configuration:', CONFIG);
         updateTokensCalculation();
     </script>
