@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST402 Token Sale</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .token-info {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .token-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            padding: 5px 0;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #555;
+            min-width: 120px;
+        }
+        
+        .info-value {
+            color: #333;
+            word-break: break-all;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1.1em;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .transaction-details {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+        
+        .transaction-details div {
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+        
+        .usd1-status {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            color: #0066cc;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+
+        .tx-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .tx-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🪙 TEST402</h1>
+            <p class="subtitle">Token Sale Platform - USD1</p>
+        </div>
+        
+        <div class="token-info">
+            <h3>📊 Token Information</h3>
+            <div class="info-item">
+                <span class="info-label">Token:</span>
+                <span class="info-value">TestB402 (TEST402)</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Price:</span>
+                <span class="info-value">100 TEST402 = 0.01 USD1</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Network:</span>
+                <span class="info-value">BSC Mainnet</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Token Address:</span>
+                <span class="info-value">0xE6710ffE33CeaAE0812ebF7080eDEb2Dc936B6fB</span>
+            </div>
+        </div>
+        
+        <div class="warning">
+            ⚠️ <strong>Important:</strong> Make sure you are on BSC Mainnet and have USD1 balance.
+        </div>
+
+        <!-- Wallet Connection Section -->
+        <div class="section">
+            <h3>🔗 1. Connect Wallet</h3>
+            <button id="connectWallet">Connect MetaMask</button>
+            <div id="walletInfo" class="hidden">
+                <div class="token-info">
+                    <div class="info-item">
+                        <span class="info-label">Connected:</span>
+                        <span id="walletAddress" class="info-value"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">BNB Balance:</span>
+                        <span id="bnbBalance" class="info-value">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- USD1 Approval Section -->
+        <div class="section">
+            <h3>🔐 2. Approve USD1</h3>
+            <button id="approveUSD1Btn" disabled>Approve USD1 for B402</button>
+            <button id="checkUSD1Btn" disabled>Check USD1 Status</button>
+            <div id="usd1Status" class="usd1-status hidden">
+                <div class="info-item">
+                    <span class="info-label">USD1 Balance:</span>
+                    <span id="usd1Balance" class="info-value">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">B402 Allowance:</span>
+                    <span id="usd1Allowance" class="info-value">-</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Payment Section -->
+        <div class="section">
+            <h3>💳 3. Buy TEST402 Tokens</h3>
+            <div class="input-group">
+                <label for="usd1Amount">USD1 Amount to Pay:</label>
+                <input type="number" id="usd1Amount" value="0.01" min="0.01" max="10" step="0.01" placeholder="0.01">
+            </div>
+            <button id="buyTokens" disabled>Buy TEST402 Tokens</button>
+            <div class="info-item">
+                <span class="info-label">You'll receive:</span>
+                <span id="tokensToReceive" class="info-value">100 TEST402</span>
+            </div>
+        </div>
+        
+        <!-- Status Section -->
+        <div class="section">
+            <h3>📈 4. Transaction Status</h3>
+            <div id="statusMessage" class="status info">
+                Connect your wallet to start...
+            </div>
+            <div id="transactionDetails" class="transaction-details hidden">
+                <!-- Transaction details will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - USD1
+        const CONFIG = {
+            BACKEND_URL: 'https://b420-test.onrender.com',
+            TOKEN_PRICE: 100, // 100 TEST402 per 0.01 USD1
+            USD1_ADDRESS: '0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d',
+            RELAYER_CONTRACT: '0xE1C2830d5DDd6B49E9c46EbE03a98Cb44CD8eA5a',
+            SELLER_ADDRESS: '0x50c1ac0BF26E55CB6064820eb4B99B086A6bDFeb'
+        };
+
+        // DOM Elements
+        const connectWalletBtn = document.getElementById('connectWallet');
+        const walletInfo = document.getElementById('walletInfo');
+        const walletAddress = document.getElementById('walletAddress');
+        const bnbBalance = document.getElementById('bnbBalance');
+        const approveUSD1Btn = document.getElementById('approveUSD1Btn');
+        const checkUSD1Btn = document.getElementById('checkUSD1Btn');
+        const usd1Status = document.getElementById('usd1Status');
+        const usd1Balance = document.getElementById('usd1Balance');
+        const usd1Allowance = document.getElementById('usd1Allowance');
+        const usd1AmountInput = document.getElementById('usd1Amount');
+        const buyTokensBtn = document.getElementById('buyTokens');
+        const tokensToReceive = document.getElementById('tokensToReceive');
+        const statusMessage = document.getElementById('statusMessage');
+        const transactionDetails = document.getElementById('transactionDetails');
+
+        // State
+        let provider, signer, userAddress;
+
+        // Event Listeners
+        connectWalletBtn.addEventListener('click', connectWallet);
+        approveUSD1Btn.addEventListener('click', approveUSD1);
+        checkUSD1Btn.addEventListener('click', checkUSD1Status);
+        buyTokensBtn.addEventListener('click', buyTokens);
+        usd1AmountInput.addEventListener('input', updateTokensCalculation);
+
+        // Update tokens calculation
+        function updateTokensCalculation() {
+            const usd1Amount = parseFloat(usd1AmountInput.value) || 0;
+            const tokens = Math.floor((usd1Amount / 0.01) * CONFIG.TOKEN_PRICE);
+            tokensToReceive.textContent = tokens.toLocaleString() + ' TEST402';
+        }
+
+        // Connect Wallet
+        async function connectWallet() {
+            try {
+                updateStatus('Connecting to MetaMask...', 'loading');
+                
+                if (!window.ethereum) {
+                    throw new Error('Please install MetaMask!');
+                }
+
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send('eth_requestAccounts', []);
+                signer = provider.getSigner();
+                userAddress = await signer.getAddress();
+
+                // Update UI
+                const shortAddress = userAddress.substring(0, 6) + '...' + userAddress.substring(38);
+                walletAddress.textContent = shortAddress;
+                walletInfo.classList.remove('hidden');
+                connectWalletBtn.textContent = '✅ Connected';
+                connectWalletBtn.disabled = true;
+                approveUSD1Btn.disabled = false;
+                checkUSD1Btn.disabled = false;
+                buyTokensBtn.disabled = false;
+
+                // Get balances
+                await getBNBBalance();
+                await checkNetwork();
+                await checkUSD1Status();
+
+                updateStatus('Wallet connected successfully!', 'success');
+
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                updateStatus('Connection failed: ' + error.message, 'error');
+            }
+        }
+
+        // Get BNB Balance
+        async function getBNBBalance() {
+            try {
+                const balance = await provider.getBalance(userAddress);
+                const balanceInBNB = ethers.utils.formatEther(balance);
+                bnbBalance.textContent = parseFloat(balanceInBNB).toFixed(4) + ' BNB';
+            } catch (error) {
+                console.error('Balance check error:', error);
+                bnbBalance.textContent = 'Error';
+            }
+        }
+
+        // Check Network
+        async function checkNetwork() {
+            try {
+                const network = await provider.getNetwork();
+                if (network.chainId !== 56) { // BSC Mainnet
+                    updateStatus('Please switch to BSC Mainnet', 'error');
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Network check error:', error);
+                return false;
+            }
+        }
+
+        // Check USD1 Status
+        async function checkUSD1Status() {
+            try {
+                const usd1Contract = new ethers.Contract(CONFIG.USD1_ADDRESS, [
+                    'function balanceOf(address) view returns (uint256)',
+                    'function allowance(address, address) view returns (uint256)'
+                ], signer);
+
+                const balance = await usd1Contract.balanceOf(userAddress);
+                const allowance = await usd1Contract.allowance(userAddress, CONFIG.RELAYER_CONTRACT);
+                
+                const balanceFormatted = parseFloat(ethers.utils.formatUnits(balance, 18)).toFixed(4);
+                const allowanceFormatted = parseFloat(ethers.utils.formatUnits(allowance, 18)).toFixed(4);
+                
+                usd1Balance.textContent = balanceFormatted + ' USD1';
+                usd1Allowance.textContent = allowanceFormatted + ' USD1';
+                usd1Status.classList.remove('hidden');
+                
+                console.log('💰 USD1 Balance:', balanceFormatted);
+                console.log('🔐 USD1 Allowance:', allowanceFormatted);
+                
+                return { balance, allowance, balanceFormatted, allowanceFormatted };
+            } catch (error) {
+                console.error('USD1 check error:', error);
+                usd1Balance.textContent = 'Error';
+                usd1Allowance.textContent = 'Error';
+                return null;
+            }
+        }
+
+        // Approve USD1
+        async function approveUSD1() {
+            try {
+                updateStatus('Approving USD1 for B402...', 'loading');
+                approveUSD1Btn.disabled = true;
+                
+                const usd1Contract = new ethers.Contract(CONFIG.USD1_ADDRESS, [
+                    'function approve(address, uint256) returns (bool)'
+                ], signer);
+
+                // Unlimited approval
+                const approveAmount = ethers.constants.MaxUint256;
+                
+                console.log('🔐 Approving USD1 to:', CONFIG.RELAYER_CONTRACT);
+                
+                const tx = await usd1Contract.approve(CONFIG.RELAYER_CONTRACT, approveAmount);
+                
+                updateStatus('Waiting for approval confirmation...', 'loading');
+                await tx.wait();
+                
+                console.log('✅ USD1 approved successfully!');
+                updateStatus('USD1 approved! You can now make payments.', 'success');
+                
+                // Refresh USD1 status
+                await checkUSD1Status();
+                
+                return true;
+            } catch (error) {
+                console.error('❌ Approval failed:', error);
+                updateStatus('Approval failed: ' + error.message, 'error');
+                return false;
+            } finally {
+                approveUSD1Btn.disabled = false;
+            }
+        }
+
+        // Buy Tokens
+        async function buyTokens() {
+            const usd1Amount = usd1AmountInput.value;
+            
+            if (!usd1Amount || usd1Amount <= 0) {
+                updateStatus('Please enter a valid USD1 amount', 'error');
+                return;
+            }
+
+            if (!await checkNetwork()) return;
+
+            try {
+                buyTokensBtn.disabled = true;
+                updateStatus('Checking USD1 status...', 'loading');
+
+                // Check USD1 balance and allowance
+                const usd1Status = await checkUSD1Status();
+                if (!usd1Status) {
+                    throw new Error('Failed to check USD1 status');
+                }
+
+                const amountInWei = ethers.utils.parseUnits(usd1Amount, 18);
+                
+                // Check balance
+                if (usd1Status.balance.lt(amountInWei)) {
+                    throw new Error(`Insufficient USD1 balance. You have ${usd1Status.balanceFormatted} USD1, need ${usd1Amount} USD1`);
+                }
+
+                // Check allowance
+                if (usd1Status.allowance.lt(amountInWei)) {
+                    updateStatus('Insufficient allowance. Please approve USD1 first.', 'error');
+                    return;
+                }
+
+                updateStatus('Creating EIP-712 authorization...', 'loading');
+
+                const amountInWeiString = amountInWei.toString();
+                console.log('💰 Amount in wei:', amountInWeiString);
+
+                const authorization = await createAuthorization(amountInWeiString);
+                
+                console.log('📝 Authorization object:', authorization);
+
+                updateStatus('Please sign EIP-712 in MetaMask...', 'loading');
+
+                const signature = await createSignature(authorization);
+                
+                console.log('✍️ Signature created, length:', signature.length);
+
+                updateStatus('Processing payment with B402...', 'loading');
+
+                const result = await sendToBackend(authorization, signature);
+                
+                if (result.success) {
+                    displaySuccess(result);
+                    await getBNBBalance();
+                    await checkUSD1Status();
+                } else {
+                    throw new Error(result.error || 'Payment failed');
+                }
+
+            } catch (error) {
+                console.error('❌ Payment error:', error);
+                
+                // Better error handling
+                if (error.message.includes('user rejected')) {
+                    updateStatus('❌ Transaction cancelled by user', 'error');
+                } else if (error.message.includes('insufficient funds')) {
+                    updateStatus('💸 Insufficient USD1 balance', 'error');
+                } else if (error.message.includes('network')) {
+                    updateStatus('🌐 Wrong network. Please switch to BSC Mainnet', 'error');
+                } else {
+                    updateStatus('Payment failed: ' + error.message, 'error');
+                }
+            } finally {
+                buyTokensBtn.disabled = false;
+            }
+        }
+
+        // Create Authorization
+        async function createAuthorization(amountInWei) {
+            const now = Math.floor(Date.now() / 1000);
+            console.log('🕒 REAL TIME DEBUG:', {
+                date: new Date().toISOString(),
+                timestamp: now,
+                expectedRange: '~1.7 billion (2024)'
+            });
+            
+            // Time buffer untuk hindari "Authorization not yet valid"
+            const validAfter = now - 120; // mulai 2 menit yang lalu
+            const validBefore = now + 600; // berlaku 10 menit
+            
+            console.log('⏰ AUTHORIZATION TIME:', {
+                validAfter: validAfter,
+                validBefore: validBefore,
+                serverTime: now
+            });
+
+            const nonce = ethers.utils.hexlify(ethers.utils.randomBytes(32));
+
+            return {
+                from: userAddress,
+                to: CONFIG.RELAYER_CONTRACT, // ✅ B402 Relayer
+                value: amountInWei,
+                token: CONFIG.USD1_ADDRESS,  // ✅ USD1 Token
+                validAfter: validAfter,
+                validBefore: validBefore,
+                nonce: nonce
+            };
+        }
+
+        // Create Signature - X402 STANDARD
+        async function createSignature(authorization) {
+            const network = await provider.getNetwork();
+            
+            // ✅ X402 STANDARD DOMAIN
+            const domain = {
+                name: 'x402',                    // ✅ 'x402' (bukan 'B402')
+                version: '1',
+                chainId: network.chainId,
+                verifyingContract: CONFIG.RELAYER_CONTRACT
+            };
+
+            // ✅ X402 STANDARD TYPES  
+            const types = {
+                PaymentAuthorization: [          // ✅ 'PaymentAuthorization' (bukan 'TransferWithAuthorization')
+                    { name: 'from', type: 'address' },
+                    { name: 'to', type: 'address' },
+                    { name: 'value', type: 'uint256' },
+                    { name: 'validAfter', type: 'uint256' },
+                    { name: 'validBefore', type: 'uint256' },
+                    { name: 'nonce', type: 'bytes32' }
+                ]
+            };
+
+            const message = {
+                from: authorization.from,
+                to: authorization.to,
+                value: ethers.BigNumber.from(authorization.value),
+                validAfter: ethers.BigNumber.from(authorization.validAfter),
+                validBefore: ethers.BigNumber.from(authorization.validBefore),
+                nonce: authorization.nonce
+            };
+
+            console.log('🔍 X402 EIP-712 Signing Details:');
+            console.log('Domain:', domain);
+            console.log('Types:', types);
+            console.log('Message:', message);
+
+            try {
+                const signature = await signer._signTypedData(domain, types, message);
+                console.log('✅ X402 EIP-712 Signature generated');
+                console.log('📝 Signature:', signature);
+                return signature;
+            } catch (error) {
+                console.error('❌ X402 EIP-712 Signing error:', error);
+                throw new Error('Failed to sign X402 EIP-712: ' + error.message);
+            }
+        }
+
+        // Send to Backend
+        async function sendToBackend(authorization, signature) {
+            console.log('🔗 Sending to backend...');
+            
+            const payload = {
+                authorization: authorization,
+                signature: signature
+            };
+
+            console.log('📦 Payload to backend:', JSON.stringify(payload, null, 2));
+
+            const response = await fetch(CONFIG.BACKEND_URL + '/accept-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            console.log('📡 Backend response status:', response.status);
+
+            let data;
+            try {
+                data = await response.json();
+            } catch (e) {
+                console.error('❌ Backend response parse error:', e);
+                throw new Error('Invalid server response: ' + e.message);
+            }
+
+            if (!response.ok || data?.success === false) {
+                console.error('❌ Backend error response:', data);
+                throw new Error(data?.error || ('Server error: ' + response.status));
+            }
+
+            console.log('✅ Backend response success:', data);
+            return data;
+        }
+
+        // Display Success
+        function displaySuccess(result) {
+            updateStatus('✅ Payment Successful!', 'success');
+            
+            let details = `
+                <div><strong>💰 Amount Paid:</strong> ${result.payment?.amountPaid || 'Unknown'}</div>
+                <div><strong>🎁 Tokens Earned:</strong> ${result.tokensEarned || 'Unknown'}</div>
+            `;
+            
+            // Add transaction links if available
+            if (result.payment?.transaction) {
+                details += `<div><strong>🔗 Payment TX:</strong> <a href="https://bscscan.com/tx/${result.payment.transaction}" target="_blank" class="tx-link">View on BscScan</a></div>`;
+            }
+            
+            if (result.tokenDistribution?.transactionHash) {
+                details += `<div><strong>🪙 Token TX:</strong> <a href="https://bscscan.com/tx/${result.tokenDistribution.transactionHash}" target="_blank" class="tx-link">View on BscScan</a></div>`;
+            }
+            
+            // Add real execution status
+            if (result.payment?.realExecution !== undefined) {
+                details += `<div><strong>🔍 Real Execution:</strong> ${result.payment.realExecution ? '✅ Confirmed' : '❌ Failed'}</div>`;
+            }
+            
+            details += `<div><strong>📝 Note:</strong> ${result.note || 'Tokens distributed to your wallet!'}</div>`;
+            
+            transactionDetails.innerHTML = details;
+            transactionDetails.classList.remove('hidden');
+        }
+
+        // Update Status
+        function updateStatus(message, type = 'info') {
+            statusMessage.textContent = message;
+            statusMessage.className = `status ${type}`;
+        }
+
+        // Initialize
+        console.log('🚀 TEST402 Token Sale Frontend Loaded - USD1 Version');
+        console.log('🔧 Configuration:', CONFIG);
+        updateTokensCalculation();
+    </script>
+</body>
+</html>
